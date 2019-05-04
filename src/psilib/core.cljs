@@ -1,7 +1,7 @@
 (ns ^:figwheel-hooks psilib.core
   (:require
    [goog.dom :as gdom]
-   [reagent.core :as reagent :refer [atom]]))
+   [reagent.core :as r :refer [atom]]))
 
 ;; BOILERPLATE
 (defn multiply [a b] (* a b))
@@ -24,15 +24,15 @@
 
 ;; THEREMIN
 ;; Instrument State
-(defonce inst-state (reagent/atom {:status 0
-                                   :osc "sine"
-                                   :detune 100
-                                   :gain 0.042
-                                   :maxGain 0.15
-                                   :minGain 0
-                                   :freq 3000
-                                   :minFreq 2000
-                                   :maxFreq 6000}))
+(defonce inst-state (r/atom {:status 0
+                             :osc "sine"
+                             :detune 100
+                             :gain 0.042
+                             :maxGain 0.15
+                             :minGain 0
+                             :freq 3000
+                             :minFreq 2000
+                             :maxFreq 6000}))
 
 ;; Define Audio Context, Oscillator & Gain Node
 (defonce context (js/window.AudioContext.))
@@ -76,3 +76,8 @@
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 )
+
+;; uncomment to stop sound if needed
+;; (. osc stop)
+;; refresh to restart .. will come up with a better method later
+
