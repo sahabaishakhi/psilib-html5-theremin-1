@@ -57,15 +57,16 @@
 
 ;; mouse event capture function
 (defn capture-mouse [ev]
-  (println ev))
-
-;; add mousemove event listener on document
-;; (set! (. js/document onmousemove) capture-mouse)
+  (println (.-clientX ev))
+  (println (.-clientY ev)))
 
 ;; HOOKS
 ;; conditionally start your application based on the presence of an "app" element
 ;; this is particularly helpful for testing this ns without launching the app
 (mount-app-element)
+
+;; add mousemove event listener on document
+(set! (.-onmousemove js/document) capture-mouse)
 
 ;; specify reload hook with ^;after-load metadata
 (defn ^:after-load on-reload []
