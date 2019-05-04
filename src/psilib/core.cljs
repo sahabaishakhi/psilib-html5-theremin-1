@@ -48,14 +48,19 @@
 (if (= 0 (:status @inst-state))
   (do (println "Yet To Start")
       (. osc start 0)
-      (swap! inst-state update-in [:status] inc)))
+      (swap! inst-state update-in [:status] inc))
+  (. context resume))
 
 ;; Create Wiring
 (. osc connect amp)
 (. amp connect (.-destination context))
 
-;; Have to call resume after some user gesture on the page, like a click
-;; (. context resume)
+;; mouse event capture function
+(defn capture-mouse [ev]
+  (println ev))
+
+;; add mousemove event listener on document
+;; (set! (. js/document onmousemove) capture-mouse)
 
 ;; HOOKS
 ;; conditionally start your application based on the presence of an "app" element
