@@ -1,7 +1,7 @@
 (ns ^:figwheel-hooks psilib.core
   (:require
    [goog.dom :as gdom]
-   [reagent.core :as r :refer [atom]]))
+   [reagent.core :as reagent :refer [atom]]))
 
 ;; BOILERPLATE
 (defn multiply [a b] (* a b))
@@ -12,7 +12,9 @@
 (defn hello-world []
   [:div
    [:h1 "A Theremin"]
-   [:h3 "Use your Gamepad"]])
+   [:h3 "Use your Gamepad"]
+   [:button#demo "Gen Audio"]]
+  )
 
 (defn mount [el]
   (reagent/render-component [hello-world] el))
@@ -21,10 +23,9 @@
   (when-let [el (get-app-element)]
     (mount el)))
 
-
 ;; THEREMIN
 ;; Instrument State
-(defonce inst-state (r/atom {:status 0
+(defonce inst-state (reagent/atom {:status 0
                              :osc "sine"
                              :detune 100
                              :gain 0.042
@@ -44,21 +45,24 @@
 (set! (.-value (.-detune osc)) (:detune @inst-state))
 (set! (.-value (.-gain amp)) (:gain @inst-state))
 
-;; Start oscillator
-(if (= 0 (:status @inst-state))
-  (do (println "Yet To Start")
-      (. osc start 0)
-      (swap! inst-state update-in [:status] inc))
-  (. context resume))
 
-;; Create Wiring
-(. osc connect amp)
-(. amp connect (.-destination context))
 
 ;; mouse event capture function
 (defn capture-mouse [ev]
   (println (.-clientX ev))
   (println (.-clientY ev)))
+
+(defn audio-button [ev]
+  ;; Start oscillator
+  (if (= 0 (:status @inst-state))
+    (do (println "Yet To Start")
+        (. osc start 0)
+        (swap! inst-state update-in [:status] inc))
+    (. context resume))
+
+  ;; Create Wiring
+  (. osc connect amp)
+  (. amp connect (.-destination context)))
 
 ;; HOOKS
 ;; conditionally start your application based on the presence of an "app" element
@@ -67,6 +71,12 @@
 
 ;; add mousemove event listener on document
 (set! (.-onmousemove js/document) capture-mouse)
+
+;; add button event listener
+;(set! (.-onclick((.getElementById "demo") js/document)) audio-button)
+(set! (-> js/document
+          (.getElementById "demo")
+          (.-onclick)) audio-button)
 
 ;; specify reload hook with ^;after-load metadata
 (defn ^:after-load on-reload []
@@ -78,6 +88,6 @@
 )
 
 ;; uncomment to stop sound if needed
-;; (. osc stop)
+(. osc stop)
 ;; refresh to restart .. will come up with a better method later
 
